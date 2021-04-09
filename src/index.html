@@ -2,11 +2,20 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Hello World!</title>
+    <title>VirtMon</title>
     <link rel="stylesheet" href="index.css">
   </head>
   <body>
-    <h1>💖 Hello World!</h1>
-    <p>Welcome to your Electron application.</p>
+    <video id="vid" autoplay></video>
+    <script defer src="./render.js"></script>
+    <!--<script>
+			navigator.mediaDevices.getUserMedia(
+			{
+				video: true
+			}).then(stream =>
+			{
+				document.getElementById("vid").srcObject = stream;
+			});
+		</script>-->
   </body>
 </html>
