@@ -1,5 +1,6 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain } = require('electron');
 const path = require('path');
+let mainWindow = null;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -9,16 +10,22 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 const createWindow = () =>
 {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1280,
     height: 720,
+    useContentSize: true,
+    autoHideMenuBar: true,
+    darkTheme: true,
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true
     }
   });
 
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
+  mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -43,5 +50,32 @@ app.on('activate', () => {
   }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
+ipcMain.on('menu:send', (event, args) =>
+{
+  let list = [];
+  for (let i = 0; i < args.length; i++)
+  {
+    list.push(
+      {
+        label: args[i],
+        click: function()
+        {
+          setCamera(args[i])
+        }
+      });
+  }
+  console.log(list);
+  const menuTemplate = [
+    {
+        label: "Source",
+        submenu: list
+    }
+  ];
+  const mainMenu = Menu.buildFromTemplate(menuTemplate);
+  Menu.setApplicationMenu(mainMenu);
+});
+
+let setCamera = (src) =>
+{
+  mainWindow.webContents.send('menu:select', src);
+};
